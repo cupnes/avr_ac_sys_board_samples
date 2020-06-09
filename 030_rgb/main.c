@@ -18,6 +18,8 @@
 #define video_data_port PORTC
 #define video_data_direction DDRC
 
+#define COUNT_MAX	90
+
 int main(void)
 {
 	output(video_sync_direction, video_sync);
@@ -25,10 +27,28 @@ int main(void)
 	output(video_data_direction, video_data_g);
 	output(video_data_direction, video_data_b);
 
+	unsigned char c = 0;
+	unsigned char cur_pin = video_data_r;
 	while (1) {
 		/* Begin: Vsync */
 		clear(video_sync_port, video_sync);
-		_delay_us(535);
+		_delay_us(527);
+		if (c < COUNT_MAX) {
+			c++;
+		} else {
+			switch (cur_pin) {
+			case video_data_r:
+				cur_pin = video_data_g;
+				break;
+			case video_data_g:
+				cur_pin = video_data_b;
+				break;
+			case video_data_b:
+				cur_pin = video_data_r;
+				break;
+			}
+			c = 0;
+		}
 		/* End: Vsync */
 
 		unsigned int i;
@@ -43,7 +63,7 @@ int main(void)
 			asm("nop");
 			asm("nop");
 			asm("nop");
-			set(video_data_port, video_data_r);
+			set(video_data_port, cur_pin);
 			asm("nop");
 			asm("nop");
 			asm("nop");
@@ -91,9 +111,7 @@ int main(void)
 			asm("nop");
 			asm("nop");
 			asm("nop");
-			asm("nop");
-			asm("nop");
-			clear(video_data_port, video_data_r);
+			clear(video_data_port, cur_pin);
 		}
 	}
 
