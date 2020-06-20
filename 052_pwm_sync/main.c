@@ -4,8 +4,8 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#define CNT_HSYNC	4
-#define CNT_VIDEO	67
+#define CNT_HSYNC	3
+#define CNT_VIDEO	40
 
 uint8_t hsync_cntr = 0;
 ISR(TIMER0_COMPB_vect)
@@ -18,7 +18,7 @@ ISR(TIMER0_COMPB_vect)
 		TCCR0A = 0;
 		PORTD &= ~_BV(PD6);
 
-		_delay_us(537);
+		_delay_us(540);
 
 		TCNT0 = 0;
 		TCCR0A = _BV(COM0A1) | _BV(COM0A0) | _BV(WGM01) | _BV(WGM00);
