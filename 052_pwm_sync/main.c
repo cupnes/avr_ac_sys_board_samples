@@ -1,5 +1,10 @@
 /* PWMでビデオSYNCの生成を試す */
 
+/* Hsync期間: 3.78 us
+ * Hsync周期: 64.8 us
+ * Vsync期間: 516 us
+ * Vsync周期: 16.5 ms */
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
