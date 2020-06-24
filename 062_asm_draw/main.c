@@ -1,7 +1,9 @@
+/* PB6 */
 #define VIDEO_SYNC_INIT	"	sbi	0x04, 6\n"
 #define VIDEO_SYNC_SET	"	sbi	0x05, 6\n"
 #define VIDEO_SYNC_CLR	"	cbi	0x05, 6\n"
 
+/* PC0 */
 #define VIDEO_R_INIT	"	sbi	0x07, 0\n"
 #define VIDEO_R_SET	"	out	0x08, r16\n"
 #define VIDEO_R_CLR	"	out	0x08, r15\n"
