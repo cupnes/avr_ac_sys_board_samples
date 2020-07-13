@@ -30,7 +30,7 @@ ISR(TIMER0_COMPA_vect)
 	volatile unsigned char _c = 7;
 	while (_c--);
 
-	if ((num_vcyc == 20) | (num_vcyc == 240)) {
+	if ((num_vcyc == 20) || (num_vcyc == 240)) {
 		PORTC |= _BV(PC0);
 	}
 	num_vcyc++;
