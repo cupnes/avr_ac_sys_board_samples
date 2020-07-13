@@ -23,19 +23,14 @@
 #define MAX_VCYC	248
 
 unsigned char num_hcyc = 0;
-unsigned char num_vcyc = 0;
 
 ISR(TIMER0_COMPA_vect)
 {
 	volatile unsigned char _c = 7;
 	while (_c--);
 
-	if ((num_vcyc == 20) || (num_vcyc == 240)) {
+	if ((num_hcyc == 20) || (num_hcyc == 240)) {
 		PORTC |= _BV(PC0);
-	}
-	num_vcyc++;
-	if (num_vcyc == MAX_VCYC) {
-		num_vcyc = 0;
 	}
 }
 
