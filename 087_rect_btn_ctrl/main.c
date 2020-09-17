@@ -33,9 +33,10 @@ struct {
 	5, 20, 7, 20
 };
 
-unsigned char t = 0;
-char vx = 1;
-char vy = 1;
+unsigned char t_up = 0;
+unsigned char t_down = 0;
+unsigned char t_left = 0;
+unsigned char t_right = 0;
 
 ISR(TIMER0_COMPA_vect)
 {
@@ -57,6 +58,10 @@ ISR(TIMER0_COMPA_vect)
 	}
 }
 
+#define BTN_UP_TH	3
+#define BTN_DOWN_TH	3
+#define BTN_LEFT_TH	6
+#define BTN_RIGHT_TH	6
 ISR(TIMER0_COMPB_vect)
 {
 	num_hcyc++;
@@ -64,20 +69,28 @@ ISR(TIMER0_COMPB_vect)
 		OCR0A = 0xff;
 
 		if (!(PINB & _BV(PINB1))) {
-			/* up */
-			rect.y--;
+			if (++t_up > BTN_UP_TH) {
+				t_up = 0;
+				rect.y--;
+			}
 		}
 		if (!(PINB & _BV(PINB2))) {
-			/* down */
-			rect.y++;
+			if (++t_down > BTN_DOWN_TH) {
+				t_down = 0;
+				rect.y++;
+			}
 		}
 		if (!(PIND & _BV(PIND0))) {
-			/* left */
-			rect.x--;
+			if (++t_left > BTN_LEFT_TH) {
+				t_left = 0;
+				rect.x--;
+			}
 		}
 		if (!(PIND & _BV(PIND1))) {
-			/* right */
-			rect.x++;
+			if (++t_right > BTN_RIGHT_TH) {
+				t_right = 0;
+				rect.x++;
+			}
 		}
 	} else {
 		OCR0A = CNT_HSYNC;
