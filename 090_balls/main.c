@@ -21,9 +21,9 @@
 #define WAIT_START_DRAW	20
 #define WAIT_DRAW_WIDTH	155
 
-#define BALL_INIT_X	10
-#define BALL_INIT_Y	20
-#define BALL_WIDTH	20
+#define BALL_INIT_X	30
+#define BALL_INIT_Y	50
+#define BALL_WIDTH	10
 #define BALL_HEIGHT	20
 
 unsigned char num_hcyc = 0;
@@ -38,20 +38,23 @@ struct rect {
 
 ISR(TIMER0_COMPA_vect)
 {
-	while (TCNT0 < WAIT_START_DRAW);
+	unsigned char in_obj = 0;
+	unsigned char sx = ball.x;
+	unsigned char lx = ball.x + ball.w;
+	if ((ball.y <= num_hcyc) && (num_hcyc < (ball.y + ball.h))) {
+		in_obj = 1;
+	}
 
-	/* unsigned char in_obj = 0; */
-	/* if ((ball.y <= num_hcyc) && (num_hcyc < (ball.y + ball.h))) { */
-	/* 	in_obj = 1; */
-	/* } */
+	while (TCNT0 < WAIT_START_DRAW);
 
 	PORTC |= _BV(PC2);
 
-	/* if (in_obj && (ball.x <= TCNT0) && (TCNT0 < (ball.x + ball.w))) { */
-	/* 	PORTC |= _BV(PC0) | _BV(PC1); */
-	/* 	while (in_obj && (ball.x <= TCNT0) && (TCNT0 < (ball.x + ball.w))); */
-	/* 	PORTC &= ~(_BV(PC0) | _BV(PC1)); */
-	/* } */
+	if (in_obj) {
+		while (TCNT0 < sx);
+		PORTC |= _BV(PC0) | _BV(PC1);
+		while (TCNT0 < lx);
+		PORTC &= ~(_BV(PC0) | _BV(PC1));
+	}
 
 	while (TCNT0 < WAIT_DRAW_WIDTH);
 
@@ -149,6 +152,7 @@ int main(void)
 	init_button_down();
 	init_button_left();
 	init_button_right();
+	init_ball();
 
 	sei();
 
