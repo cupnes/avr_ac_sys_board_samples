@@ -18,10 +18,8 @@
 #define CNT_HCYC	155
 #define CYC_VSYNC_START	248
 
-#define SCREEN_WIDTH	100
-
-#define WAIT_START_DRAW	5
-#define WAIT_DRAW_WIDTH	SCREEN_WIDTH
+#define WAIT_START_DRAW	20
+#define WAIT_DRAW_WIDTH	155
 
 #define BALL_INIT_X	10
 #define BALL_INIT_Y	20
@@ -40,13 +38,22 @@ struct rect {
 
 ISR(TIMER0_COMPA_vect)
 {
-	volatile unsigned char _c = WAIT_START_DRAW;
-	while (_c--);
+	while (TCNT0 < WAIT_START_DRAW);
+
+	/* unsigned char in_obj = 0; */
+	/* if ((ball.y <= num_hcyc) && (num_hcyc < (ball.y + ball.h))) { */
+	/* 	in_obj = 1; */
+	/* } */
 
 	PORTC |= _BV(PC2);
 
-	volatile unsigned char x = 0;
-	for (; x < WAIT_DRAW_WIDTH; x++);
+	/* if (in_obj && (ball.x <= TCNT0) && (TCNT0 < (ball.x + ball.w))) { */
+	/* 	PORTC |= _BV(PC0) | _BV(PC1); */
+	/* 	while (in_obj && (ball.x <= TCNT0) && (TCNT0 < (ball.x + ball.w))); */
+	/* 	PORTC &= ~(_BV(PC0) | _BV(PC1)); */
+	/* } */
+
+	while (TCNT0 < WAIT_DRAW_WIDTH);
 
 	PORTC &= ~_BV(PC2);
 }
