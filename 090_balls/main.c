@@ -33,10 +33,10 @@
 #define BALL0_WIDTH	10
 #define BALL0_HEIGHT	20
 
-#define BALL1_INIT_X	100
-#define BALL1_INIT_Y	70
-#define BALL1_WIDTH	10
-#define BALL1_HEIGHT	20
+#define BALL1_INIT_X	65
+#define BALL1_INIT_Y	220
+#define BALL1_WIDTH	50
+#define BALL1_HEIGHT	10
 
 unsigned char num_hcyc = 0;
 unsigned char num_vcyc = 0;
