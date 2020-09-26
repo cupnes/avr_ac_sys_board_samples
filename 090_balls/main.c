@@ -38,6 +38,10 @@
 #define BALL1_WIDTH	50
 #define BALL1_HEIGHT	10
 
+#define IS_BUTTON_LEFT	(!(PIND & _BV(PIND0)))
+#define IS_BUTTON_RIGHT	(!(PIND & _BV(PIND1)))
+#define CTRL_UNIT	1
+
 unsigned char num_hcyc = 0;
 unsigned char num_vcyc = 0;
 
@@ -281,6 +285,17 @@ void move_ball(unsigned char obj)
 	}
 }
 
+void ctrl_ball(unsigned char obj)
+{
+	if (IS_BUTTON_LEFT && ((balls[obj].sx - SCREEN_SX) >= CTRL_UNIT)) {
+		balls[obj].sx -= CTRL_UNIT;
+		balls[obj].ex -= CTRL_UNIT;
+	} else if (IS_BUTTON_RIGHT && ((balls[obj].ex + CTRL_UNIT) <= SCREEN_EX)) {
+		balls[obj].sx += CTRL_UNIT;
+		balls[obj].ex += CTRL_UNIT;
+	}
+}
+
 int main(void)
 {
 	init_hsync();
@@ -300,6 +315,7 @@ int main(void)
 
 	while (1) {
 		move_ball(0);
+		ctrl_ball(1);
 
 		render();
 
