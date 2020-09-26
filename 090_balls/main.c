@@ -232,15 +232,52 @@ void move_ball(unsigned char obj)
 	balls[obj].sy += bv[obj].y;
 	balls[obj].ey += bv[obj].y;
 
-	if (balls[obj].sx <= SCREEN_SX) {
-		bv[obj].x = 1;
-	} else if (balls[obj].ex >= SCREEN_EX) {
-		bv[obj].x = -1;
+	unsigned char is_updated = 0;
+	unsigned char i;
+
+	for (i = 0; i < NUM_BALLS; i++) {
+		if (i == obj) continue;
+		if ((balls[obj].ey < balls[i].sy) || (balls[obj].sy > balls[i].ey)) continue;
+
+		if ((balls[obj].sx > balls[i].sx) && (balls[obj].sx <= balls[i].ex)) {
+			bv[obj].x = 1;
+			is_updated = 1;
+			break;
+		} else if ((balls[obj].sx < balls[i].sx) && (balls[obj].ex >= balls[i].sx)) {
+			bv[obj].x = -1;
+			is_updated = 1;
+			break;
+		}
 	}
-	if (balls[obj].sy <= SCREEN_SY) {
-		bv[obj].y = 1;
-	} else if (balls[obj].ey >= SCREEN_EY) {
-		bv[obj].y = -1;
+	if (!is_updated) {
+		if (balls[obj].sx <= SCREEN_SX) {
+			bv[obj].x = 1;
+		} else if (balls[obj].ex >= SCREEN_EX) {
+			bv[obj].x = -1;
+		}
+	}
+
+	is_updated = 0;
+	for (i = 0; i < NUM_BALLS; i++) {
+		if (i == obj) continue;
+		if ((balls[obj].ex < balls[i].sx) || (balls[obj].sx > balls[i].ex)) continue;
+
+		if ((balls[obj].sy > balls[i].sy) && (balls[obj].sy <= balls[i].ey)) {
+			bv[obj].y = 1;
+			is_updated = 1;
+			break;
+		} else if ((balls[obj].sy < balls[i].sy) && (balls[obj].ey >= balls[i].sy)) {
+			bv[obj].y = -1;
+			is_updated = 1;
+			break;
+		}
+	}
+	if (!is_updated) {
+		if (balls[obj].sy <= SCREEN_SY) {
+			bv[obj].y = 1;
+		} else if (balls[obj].ey >= SCREEN_EY) {
+			bv[obj].y = -1;
+		}
 	}
 }
 
