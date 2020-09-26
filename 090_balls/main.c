@@ -21,6 +21,11 @@
 #define WAIT_START_DRAW	20
 #define WAIT_DRAW_WIDTH	155
 
+#define SCREEN_SX	(WAIT_START_DRAW + 5)
+#define SCREEN_EX	(WAIT_DRAW_WIDTH - 6)
+#define SCREEN_SY	(17)
+#define SCREEN_EY	(CYC_VSYNC_START - 6)
+
 #define NUM_BALLS	2
 
 #define BALL0_INIT_X	30
@@ -196,14 +201,14 @@ void move_ball(unsigned char obj)
 	balls[obj].sy += bv[obj].y;
 	balls[obj].ey += bv[obj].y;
 
-	if (balls[obj].sx <= WAIT_START_DRAW) {
+	if (balls[obj].sx <= SCREEN_SX) {
 		bv[obj].x = 1;
-	} else if (balls[obj].ex >= (WAIT_DRAW_WIDTH - 1)) {
+	} else if (balls[obj].ex >= SCREEN_EX) {
 		bv[obj].x = -1;
 	}
-	if (balls[obj].sy <= 0) {
+	if (balls[obj].sy <= SCREEN_SY) {
 		bv[obj].y = 1;
-	} else if (balls[obj].ey >= (CYC_VSYNC_START - 1)) {
+	} else if (balls[obj].ey >= SCREEN_EY) {
 		bv[obj].y = -1;
 	}
 }
@@ -226,16 +231,12 @@ int main(void)
 	start_video_sync();
 
 	while (1) {
-		/* while (num_hcyc < CYC_VSYNC_START); */
+		move_ball(0);
 
 		render();
 
-		/* while (num_hcyc >= CYC_VSYNC_START); */
-
 		volatile unsigned int c = 1000;
 		while (c--);
-
-		move_ball(0);
 	}
 
 	return 0;
