@@ -19,7 +19,7 @@
 #define CYC_VSYNC_START	248
 
 #define WAIT_START_DRAW	20
-#define WAIT_DRAW_WIDTH	155
+#define WAIT_DRAW_WIDTH	150
 
 #define SCREEN_SX	(WAIT_START_DRAW + 5)
 #define SCREEN_EX	(WAIT_DRAW_WIDTH - 6)
@@ -29,7 +29,7 @@
 #define NUM_BALLS	2
 
 #define BALL0_INIT_X	30
-#define BALL0_INIT_Y	50
+#define BALL0_INIT_Y	70
 #define BALL0_WIDTH	10
 #define BALL0_HEIGHT	20
 
@@ -66,8 +66,8 @@ ISR(TIMER0_COMPA_vect)
 	PORTC |= _BV(PC2);
 
 	while (oseq) {
-		unsigned char obj = (oseq % 16) - 1;
-		oseq /= 16;
+		unsigned char obj = (oseq & 0x0000000f) - 1;
+		oseq >>= 4;
 		while (TCNT0 < balls[obj].sx);
 		PORTC |= _BV(PC0) | _BV(PC1);
 		while (TCNT0 <= balls[obj].ex);
