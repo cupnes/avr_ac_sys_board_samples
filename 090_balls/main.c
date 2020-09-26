@@ -35,7 +35,6 @@
 
 unsigned char num_hcyc = 0;
 unsigned char num_vcyc = 0;
-unsigned char do_update = 0;
 
 struct rect {
 	unsigned char sx;
@@ -45,6 +44,11 @@ struct rect {
 	unsigned char w;
 	unsigned char h;
 } balls[NUM_BALLS];
+
+struct velocity {
+	char x;
+	char y;
+} bv[NUM_BALLS];
 
 unsigned int obj_seq[CYC_VSYNC_START];
 
@@ -61,7 +65,7 @@ ISR(TIMER0_COMPA_vect)
 		oseq /= 16;
 		while (TCNT0 < balls[obj].sx);
 		PORTC |= _BV(PC0) | _BV(PC1);
-		while (TCNT0 < balls[obj].ex);
+		while (TCNT0 <= balls[obj].ex);
 		PORTC &= ~(_BV(PC0) | _BV(PC1));
 	}
 
@@ -76,9 +80,6 @@ ISR(TIMER0_COMPB_vect)
 	if (num_hcyc >= CYC_VSYNC_START) {
 		/* Vsync: 248 <= Hcyc <= 255 */
 		OCR0A = 0xff;
-		if (num_hcyc == CYC_VSYNC_START) {
-			do_update = 1;
-		}
 	} else {
 		/* Draw: 0 <= Hcyc <= 247 */
 		OCR0A = CNT_HSYNC;
@@ -163,6 +164,9 @@ void init_balls(void)
 	balls[1].ey = BALL1_INIT_Y + BALL1_HEIGHT;
 	balls[1].w = BALL1_WIDTH;
 	balls[1].h = BALL1_HEIGHT;
+
+	bv[0].x = bv[0].y = 1;
+	bv[1].x = bv[1].y = 1;
 }
 
 void init_obj_seq(void)
@@ -170,6 +174,37 @@ void init_obj_seq(void)
 	unsigned char i;
 	for (i = 0; i < CYC_VSYNC_START; i++) {
 		obj_seq[i] = 0;
+	}
+}
+
+void render(void)
+{
+	unsigned char y;
+	for (y = 0; y < CYC_VSYNC_START; y++) {
+		if ((balls[0].sy <= y) && (y <= balls[0].ey)) {
+			obj_seq[y] = 1;
+		} else {
+			obj_seq[y] = 0;
+		}
+	}
+}
+
+void move_ball(unsigned char obj)
+{
+	balls[obj].sx += bv[obj].x;
+	balls[obj].ex += bv[obj].x;
+	balls[obj].sy += bv[obj].y;
+	balls[obj].ey += bv[obj].y;
+
+	if (balls[obj].sx <= WAIT_START_DRAW) {
+		bv[obj].x = 1;
+	} else if (balls[obj].ex >= (WAIT_DRAW_WIDTH - 1)) {
+		bv[obj].x = -1;
+	}
+	if (balls[obj].sy <= 0) {
+		bv[obj].y = 1;
+	} else if (balls[obj].ey >= (CYC_VSYNC_START - 1)) {
+		bv[obj].y = -1;
 	}
 }
 
@@ -190,7 +225,18 @@ int main(void)
 
 	start_video_sync();
 
-	while (1);
+	while (1) {
+		/* while (num_hcyc < CYC_VSYNC_START); */
+
+		render();
+
+		/* while (num_hcyc >= CYC_VSYNC_START); */
+
+		volatile unsigned int c = 1000;
+		while (c--);
+
+		move_ball(0);
+	}
 
 	return 0;
 }
