@@ -182,14 +182,45 @@ void init_obj_seq(void)
 	}
 }
 
+void sort_candidates(unsigned char candidates[NUM_BALLS], unsigned char n)
+{
+	unsigned char i;
+	for (i = 0; i < (n - 1); i++) {
+		unsigned char j;
+		for (j = 0; j < (n - i - 1); j++) {
+			unsigned char obj_a = candidates[j] - 1;
+			unsigned char obj_b = candidates[j + 1] - 1;
+			if (balls[obj_a].sx > balls[obj_b].sx) {
+				unsigned char t = candidates[j];
+				candidates[j] = candidates[j + 1];
+				candidates[j + 1] = t;
+			}
+		}
+	}
+}
+
 void render(void)
 {
 	unsigned char y;
 	for (y = 0; y < CYC_VSYNC_START; y++) {
-		if ((balls[0].sy <= y) && (y <= balls[0].ey)) {
-			obj_seq[y] = 1;
-		} else {
+		unsigned char candidates[NUM_BALLS];
+		unsigned char i;
+		unsigned char n = 0;
+		for (i = 0; i < NUM_BALLS; i++) {
+			if ((balls[i].sy <= y) && (y <= balls[i].ey)) {
+				candidates[n++] = i + 1;
+			}
+		}
+		if (n == 0) {
 			obj_seq[y] = 0;
+		} else if (n == 1) {
+			obj_seq[y] = candidates[0];
+		} else {
+			sort_candidates(candidates, n);
+			obj_seq[y] = 0;
+			for (i = 0; i < n; i++) {
+				obj_seq[y] += candidates[i] << (4 * i);
+			}
 		}
 	}
 }
