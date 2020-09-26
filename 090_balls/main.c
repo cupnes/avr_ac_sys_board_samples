@@ -38,32 +38,30 @@ unsigned char num_vcyc = 0;
 unsigned char do_update = 0;
 
 struct rect {
-	unsigned char x;
-	unsigned char y;
+	unsigned char sx;
+	unsigned char sy;
+	unsigned char ex;
+	unsigned char ey;
 	unsigned char w;
 	unsigned char h;
 } balls[NUM_BALLS];
 
+unsigned int obj_seq[CYC_VSYNC_START];
+
 ISR(TIMER0_COMPA_vect)
 {
-	/* TODO レンダリング用のデータ構造が有ったほうが良い */
-
-	unsigned char in_obj[NUM_BALLS] = 0;
-	unsigned char i;
-	for (i = 0; i < NUM_BALLS; i++) {
-		if ((balls[i].y <= num_hcyc) && (num_hcyc < (balls[i].y + balls[i].h))) {
-			in_obj[i] = 1;
-		}
-	}
+	unsigned int oseq = obj_seq[num_hcyc];
 
 	while (TCNT0 < WAIT_START_DRAW);
 
 	PORTC |= _BV(PC2);
 
-	if (in_obj) {
-		while (TCNT0 < sx);
+	while (oseq) {
+		unsigned char obj = (oseq % 16) - 1;
+		oseq /= 16;
+		while (TCNT0 < balls[obj].sx);
 		PORTC |= _BV(PC0) | _BV(PC1);
-		while (TCNT0 < lx);
+		while (TCNT0 < balls[obj].ex);
 		PORTC &= ~(_BV(PC0) | _BV(PC1));
 	}
 
@@ -152,15 +150,27 @@ void start_video_sync(void)
 
 void init_balls(void)
 {
-	balls[0].x = BALL0_INIT_X;
-	balls[0].y = BALL0_INIT_Y;
+	balls[0].sx = BALL0_INIT_X;
+	balls[0].sy = BALL0_INIT_Y;
+	balls[0].ex = BALL0_INIT_X + BALL0_WIDTH;
+	balls[0].ey = BALL0_INIT_Y + BALL0_HEIGHT;
 	balls[0].w = BALL0_WIDTH;
 	balls[0].h = BALL0_HEIGHT;
 
-	balls[1].x = BALL1_INIT_X;
-	balls[1].y = BALL1_INIT_Y;
+	balls[1].sx = BALL1_INIT_X;
+	balls[1].sy = BALL1_INIT_Y;
+	balls[1].ex = BALL1_INIT_X + BALL1_WIDTH;
+	balls[1].ey = BALL1_INIT_Y + BALL1_HEIGHT;
 	balls[1].w = BALL1_WIDTH;
 	balls[1].h = BALL1_HEIGHT;
+}
+
+void init_obj_seq(void)
+{
+	unsigned char i;
+	for (i = 0; i < CYC_VSYNC_START; i++) {
+		obj_seq[i] = 0;
+	}
 }
 
 int main(void)
@@ -174,6 +184,7 @@ int main(void)
 	init_button_left();
 	init_button_right();
 	init_balls();
+	init_obj_seq();
 
 	sei();
 
